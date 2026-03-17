@@ -30,6 +30,13 @@ class MainActivity : AppCompatActivity() {
         mTitle.layoutParams = params
         mLayout.addView(mTitle)
 
+        val mProgress = ProgressBar(
+            this,
+            null,
+            androidx.appcompat.R.attr.progressBarStyle,
+            androidx.appcompat.R.style.Widget_AppCompat_ProgressBar_Horizontal
+        )
+
         for (i in 1..6) {
             val row = LinearLayout(this)
             row.layoutParams = LinearLayout.LayoutParams(
@@ -48,7 +55,14 @@ class MainActivity : AppCompatActivity() {
                 it.text = "TESTUJ"
                 it.textSize = 24f
                 it.setOnClickListener({
-                    runTest(i)
+                    if(mBoxes[i-1].isChecked){
+
+                    }
+                    else{
+                        runTest(i)
+                        if(mBoxes[i-1].isChecked)
+                            mProgress.progress += 17
+                    }
                 })
             }
 
@@ -56,7 +70,10 @@ class MainActivity : AppCompatActivity() {
 
             mLayout.addView(row)
 
+
         }
+
+        mLayout.addView(mProgress)
     }
 
     private fun runTest(nr: Int){
