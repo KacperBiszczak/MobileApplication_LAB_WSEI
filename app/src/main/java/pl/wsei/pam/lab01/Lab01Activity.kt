@@ -8,9 +8,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toolbar.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
-import kotlin.math.log
 
-class MainActivity : AppCompatActivity() {
+class Lab01Activity : AppCompatActivity() {
     lateinit var mLayout: LinearLayout
     lateinit var mTitle: TextView
 
@@ -18,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     var mButtons: MutableList<Button> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_lab01)
         mLayout = findViewById(R.id.main)
 
         mTitle = TextView(this)
