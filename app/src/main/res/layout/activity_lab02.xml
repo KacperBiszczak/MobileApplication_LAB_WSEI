@@ -1,56 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.gridlayout.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/favorites_grid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:columnCount="3"
+    app:useDefaultMargins="true"
+    android:padding="16dp"
     tools:context="pl.wsei.pam.lab02.Lab02Activity">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_4_4_board"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="88dp"
-        android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/button3"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        android:onClick="onClickButtonLab02"
+        android:tag="6 6"
+        android:text="@string/_6_x_6"
+        android:textSize="34sp"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/outline_clarify_24"
+        app:iconGravity="textTop"
+        app:iconPadding="12dp"
+        app:iconSize="48dp"
+        app:layout_columnWeight="1"
+        app:layout_rowWeight="1" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/main_4_6_board"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:onClick="onClickButtonLab02"
+        android:tag="4 4"
+        android:text="@string/_4_x_4"
+        android:textSize="34sp"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/outline_clarify_24"
+        app:iconGravity="textTop"
+        app:iconPadding="12dp"
+        app:iconSize="48dp"
+        app:layout_columnWeight="1"
+        app:layout_rowWeight="1" />
+
+    <Space
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/button4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_column="2" />
 
     <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_6_4_board"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button"
-        app:layout_constraintVertical_bias="0.5" />
+        android:onClick="onClickButtonLab02"
+        android:tag="4 3"
+        android:text="@string/_4_x_3"
+        android:textSize="34sp"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/outline_clarify_24"
+        app:iconGravity="textTop"
+        app:iconPadding="12dp"
+        app:iconSize="48dp"
+        app:layout_columnWeight="1"
+        app:layout_rowWeight="1" />
 
     <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_6_6_board"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.753"
-        app:layout_constraintStart_toEndOf="@+id/button3"
-        app:layout_constraintTop_toBottomOf="@+id/button2"
-        app:layout_constraintVertical_bias="0.5" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:onClick="onClickButtonLab02"
+        android:tag="3 2"
+        android:text="@string/_3_x_2"
+        android:textSize="34sp"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/outline_clarify_24"
+        app:iconGravity="textTop"
+        app:iconPadding="12dp"
+        app:iconSize="48dp"
+        app:layout_columnWeight="1"
+        app:layout_rowWeight="1" />
+
+</androidx.gridlayout.widget.GridLayout>
