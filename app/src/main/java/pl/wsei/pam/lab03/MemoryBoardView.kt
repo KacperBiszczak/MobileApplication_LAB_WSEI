@@ -18,7 +18,8 @@ class MemoryBoardView(
         R.drawable.baseline_roller_skating_24,
         R.drawable.outline_add_card_24,
         R.drawable.baseline_sports_baseball_24,
-        R.drawable.baseline_supervisor_account_24
+        R.drawable.baseline_supervisor_account_24,
+        R.drawable.baseline_air_24
 
 
         // dodaj kolejne identyfikatory utworzonych ikon
