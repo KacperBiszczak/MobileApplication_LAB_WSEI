@@ -19,11 +19,27 @@ class MemoryBoardView(
         R.drawable.outline_add_card_24,
         R.drawable.baseline_sports_baseball_24,
         R.drawable.baseline_supervisor_account_24,
-        R.drawable.baseline_air_24
+        R.drawable.baseline_air_24,
+        R.drawable.outline_agriculture_24,
+        R.drawable.outline_air_freshener_24,
+        R.drawable.outline_comedy_mask_24,
+        R.drawable.outline_adb_24,
+        R.drawable.outline_celebration_24,
+        R.drawable.outline_church_24,
+        R.drawable.outline_chess_knight_24,
+        R.drawable.outline_chess_bishop_2_24,
+        R.drawable.outline_battery_android_frame_bolt_24,
+        R.drawable.outline_allergy_24,
+        R.drawable.outline_fingerprint_24,
+        R.drawable.outline_filter_vintage_24,
+        R.drawable.outline_30fps_24
+
+
 
 
         // dodaj kolejne identyfikatory utworzonych ikon
     )
+
     init {
         val shuffledIcons: MutableList<Int> = mutableListOf<Int>().also {
             it.addAll(icons.subList(0, cols * rows / 2))
@@ -31,11 +47,30 @@ class MemoryBoardView(
             it.shuffle()
         }
 
-        // z aktywności lab03
+        for (row in 0 until rows) {
+            for (col in 0 until cols) {
 
-        // tu umieść kod pętli tworzący wszystkie karty, który jest obecnie
-        // w aktywności Lab03Activity
+                val btn = ImageButton(gridLayout.context).also {
+                    it.tag = "${row}x${col}"
+
+                    val layoutParams = GridLayout.LayoutParams()
+                    layoutParams.width = 0
+                    layoutParams.height = 0
+                    layoutParams.setGravity(Gravity.CENTER)
+                    layoutParams.columnSpec = GridLayout.spec(col, 1, 1f)
+                    layoutParams.rowSpec = GridLayout.spec(row, 1, 1f)
+
+                    it.layoutParams = layoutParams
+                    gridLayout.addView(it)
+                }
+
+                val resource = shuffledIcons.removeAt(0)
+
+                addTile(btn, resource)
+            }
+        }
     }
+
     private val deckResource: Int = R.drawable.deck
     private var onGameChangeStateListener: (MemoryGameEvent) -> Unit = { (e) -> }
     private val matchedPair: Stack<Tile> = Stack()
