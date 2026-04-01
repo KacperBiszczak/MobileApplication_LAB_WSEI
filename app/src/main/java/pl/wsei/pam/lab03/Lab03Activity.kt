@@ -1,7 +1,8 @@
 package pl.wsei.pam.lab03
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -36,20 +37,33 @@ class Lab03Activity : AppCompatActivity() {
         mBoardModel.setOnGameChangeListener { e ->
             when (e.state) {
                 GameStates.Matching -> {
-                    e.tiles.forEach { tile -> tile.revealed = true }
+                    e.tiles.forEach { tile -> 
+                        tile.revealed = true 
+                        tile.button.imageTintList = ColorStateList.valueOf(Color.BLACK)
+                    }
                 }
                 GameStates.Match -> {
                     e.tiles.forEach { tile ->
                         tile.revealed = true
+                        tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
+                        tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
                     }
                 }
                 GameStates.NoMatch -> {
                     mBoardModel.lock()
-                    e.tiles.forEach { tile -> tile.revealed = true }
+                    e.tiles.forEach { tile -> 
+                        tile.revealed = true 
+//                        tile.button.backgroundTintList = ColorStateList.valueOf(Color.RED)
+//                        tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
+                    }
                     Timer().schedule(1000) {
                         runOnUiThread {
-                            e.tiles.forEach { tile -> tile.revealed = false }
+                            e.tiles.forEach { tile -> 
+                                tile.revealed = false 
+//                                tile.button.backgroundTintList = null
+//                                tile.button.imageTintList = null
+                            }
                             mBoardModel.unlock()
                         }
                     }
@@ -57,6 +71,8 @@ class Lab03Activity : AppCompatActivity() {
                 GameStates.Finished -> {
                     e.tiles.forEach { tile ->
                         tile.revealed = true
+                        tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
+                        tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
                     }
                     Toast.makeText(this, "Gratulacje! Gra ukończona. \uD83C\uDFC6", Toast.LENGTH_LONG).show()

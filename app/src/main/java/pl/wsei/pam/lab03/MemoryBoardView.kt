@@ -58,14 +58,17 @@ class MemoryBoardView(
                     it.tag = "${row}x${col}"
 
                     it.scaleType = ImageView.ScaleType.FIT_CENTER
-                    it.setPadding(5, 5, 5, 5)
+                    it.setPadding(10, 10, 10, 10)
 
                     val layoutParams = GridLayout.LayoutParams()
                     layoutParams.width = 0
                     layoutParams.height = 0
-                    layoutParams.setGravity(Gravity.CENTER)
+                    layoutParams.setGravity(Gravity.FILL)
                     layoutParams.columnSpec = GridLayout.spec(col, 1, 1f)
                     layoutParams.rowSpec = GridLayout.spec(row, 1, 1f)
+                    
+                    // Dodajemy marginesy, aby zachować odstępy między przyciskami
+                    layoutParams.setMargins(10, 10, 10, 10)
 
                     it.layoutParams = layoutParams
                     gridLayout.addView(it)
