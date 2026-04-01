@@ -59,7 +59,7 @@ class Lab03Activity : AppCompatActivity() {
                         tile.revealed = true
                         tile.removeOnClickListener()
                     }
-                    Toast.makeText(this, "Gratulacje! Gra ukończona.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Gratulacje! Gra ukończona. \uD83C\uDFC6", Toast.LENGTH_LONG).show()
                 }
             }
         }
