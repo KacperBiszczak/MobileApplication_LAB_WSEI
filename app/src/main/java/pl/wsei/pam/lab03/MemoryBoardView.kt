@@ -3,6 +3,7 @@ package pl.wsei.pam.lab03
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.gridlayout.widget.GridLayout
 import pl.wsei.pam.lab01.R
 import java.util.Stack
@@ -55,6 +56,9 @@ class MemoryBoardView(
 
                 val btn = ImageButton(gridLayout.context).also {
                     it.tag = "${row}x${col}"
+
+                    it.scaleType = ImageView.ScaleType.FIT_CENTER
+                    it.setPadding(5, 5, 5, 5)
 
                     val layoutParams = GridLayout.LayoutParams()
                     layoutParams.width = 0
