@@ -33,17 +33,20 @@ class MemoryBoardView(
         R.drawable.outline_fingerprint_24,
         R.drawable.outline_filter_vintage_24,
         R.drawable.outline_30fps_24
-
-
-
-
-        // dodaj kolejne identyfikatory utworzonych ikon
     )
 
     init {
+        val totalTiles = cols * rows
+        val numPairs = totalTiles / 2
         val shuffledIcons: MutableList<Int> = mutableListOf<Int>().also {
-            it.addAll(icons.subList(0, cols * rows / 2))
-            it.addAll(icons.subList(0, cols * rows / 2))
+            for (i in 0 until numPairs) {
+                val icon = icons[i % icons.size]
+                it.add(icon)
+                it.add(icon)
+            }
+            if (totalTiles % 2 != 0) {
+                it.add(icons[numPairs % icons.size])
+            }
             it.shuffle()
         }
 
@@ -64,23 +67,39 @@ class MemoryBoardView(
                     gridLayout.addView(it)
                 }
 
-                val resource = shuffledIcons.removeAt(0)
-
-                addTile(btn, resource)
+                if (shuffledIcons.isNotEmpty()) {
+                    val resource = shuffledIcons.removeAt(0)
+                    addTile(btn, resource)
+                }
             }
         }
     }
 
     private val deckResource: Int = R.drawable.deck
-    private var onGameChangeStateListener: (MemoryGameEvent) -> Unit = { (e) -> }
+    private var onGameChangeStateListener: (MemoryGameEvent) -> Unit = {}
     private val matchedPair: Stack<Tile> = Stack()
     private val logic: MemoryGameLogic = MemoryGameLogic(cols * rows / 2)
+    private var isLocked: Boolean = false
+
+    fun lock() {
+        isLocked = true
+    }
+
+    fun unlock() {
+        isLocked = false
+    }
 
     private fun onClickTile(v: View) {
-        val tile = tiles[v.tag]
+        if (isLocked) return
+        val tile = tiles[v.tag] ?: return
+        
+        if (tile.revealed || matchedPair.contains(tile)) return
+        
+        if (matchedPair.size >= 2) return
+
         matchedPair.push(tile)
         val matchResult = logic.process {
-            tile?.tileResource?:-1
+            tile.tileResource
         }
         onGameChangeStateListener(MemoryGameEvent(matchedPair.toList(), matchResult))
         if (matchResult != GameStates.Matching) {

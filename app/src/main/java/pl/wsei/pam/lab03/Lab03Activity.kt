@@ -2,7 +2,6 @@ package pl.wsei.pam.lab03
 
 import android.os.Bundle
 import android.view.Gravity
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,44 +23,45 @@ class Lab03Activity : AppCompatActivity() {
             insets
         }
 
-        val size = intent.getIntArrayExtra("size") ?: intArrayOf(3,3)
-        val rows = size[0];
-        val cols = size[1];
+        val size = intent.getIntArrayExtra("size") ?: intArrayOf(4, 4)
+        val rows = size[0]
+        val cols = size[1]
 
-        val mBoard: GridLayout = findViewById<GridLayout>(R.id.main)
-        mBoard.rowCount = rows;
-        mBoard.columnCount = cols;
+        val mBoard: GridLayout = findViewById(R.id.main)
+        mBoard.rowCount = rows
+        mBoard.columnCount = cols
 
         val mBoardModel = MemoryBoardView(mBoard, cols, rows)
 
         mBoardModel.setOnGameChangeListener { e ->
-            run {
-                when (e.state) {
-                    GameStates.Matching -> {
-                        e.tiles.forEach {
-                            tile -> tile.revealed = true
+            when (e.state) {
+                GameStates.Matching -> {
+                    e.tiles.forEach { tile -> tile.revealed = true }
+                }
+                GameStates.Match -> {
+                    e.tiles.forEach { tile ->
+                        tile.revealed = true
+                        tile.removeOnClickListener()
+                    }
+                }
+                GameStates.NoMatch -> {
+                    mBoardModel.lock()
+                    e.tiles.forEach { tile -> tile.revealed = true }
+                    Timer().schedule(1000) {
+                        runOnUiThread {
+                            e.tiles.forEach { tile -> tile.revealed = false }
+                            mBoardModel.unlock()
                         }
                     }
-                    GameStates.Match -> {
-                        e.tiles.forEach {
-                                tile -> tile.revealed = true
-                        }
+                }
+                GameStates.Finished -> {
+                    e.tiles.forEach { tile ->
+                        tile.revealed = true
+                        tile.removeOnClickListener()
                     }
-                    GameStates.NoMatch -> {
-                        e.tiles.forEach {
-                                tile -> tile.revealed = true
-                            Timer().schedule(2000) {
-                                tile.revealed = false
-                            }
-                        }
-                    }
-                    GameStates.Finished -> {
-                        Toast.makeText(this, "Game finished", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(this, "Gratulacje! Gra ukończona.", Toast.LENGTH_LONG).show()
                 }
             }
         }
-
-
     }
 }
