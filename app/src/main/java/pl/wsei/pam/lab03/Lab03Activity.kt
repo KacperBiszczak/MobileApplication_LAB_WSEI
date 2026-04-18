@@ -14,6 +14,8 @@ import java.util.Timer
 import kotlin.concurrent.schedule
 
 class Lab03Activity : AppCompatActivity() {
+    private lateinit var mBoardModel: MemoryBoardView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,7 +34,21 @@ class Lab03Activity : AppCompatActivity() {
         mBoard.rowCount = rows
         mBoard.columnCount = cols
 
-        val mBoardModel = MemoryBoardView(mBoard, cols, rows)
+        mBoardModel = MemoryBoardView(mBoard, cols, rows)
+
+        if (savedInstanceState != null) {
+            val state = savedInstanceState.getIntArray("state")
+            if (state != null) {
+                mBoardModel.setState(state)
+                mBoardModel.getTiles().forEach { tile ->
+                    if (tile.revealed) {
+                        tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
+                        tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
+                        tile.removeOnClickListener()
+                    }
+                }
+            }
+        }
 
         mBoardModel.setOnGameChangeListener { e ->
             when (e.state) {
@@ -54,15 +70,11 @@ class Lab03Activity : AppCompatActivity() {
                     mBoardModel.lock()
                     e.tiles.forEach { tile -> 
                         tile.revealed = true 
-//                        tile.button.backgroundTintList = ColorStateList.valueOf(Color.RED)
-//                        tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                     }
                     Timer().schedule(1000) {
                         runOnUiThread {
                             e.tiles.forEach { tile -> 
                                 tile.revealed = false 
-//                                tile.button.backgroundTintList = null
-//                                tile.button.imageTintList = null
                             }
                             mBoardModel.unlock()
                         }
@@ -79,5 +91,10 @@ class Lab03Activity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putIntArray("state", mBoardModel.getState())
     }
 }

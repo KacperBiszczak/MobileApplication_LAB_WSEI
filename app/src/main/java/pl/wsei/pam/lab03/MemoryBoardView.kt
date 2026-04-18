@@ -96,6 +96,64 @@ class MemoryBoardView(
         isLocked = false
     }
 
+    fun getState(): IntArray {
+        val state = IntArray(rows * cols)
+        for (row in 0 until rows) {
+            for (col in 0 until cols) {
+                val index = row * cols + col
+                val tile = tiles["${row}x${col}"]
+                state[index] = if (tile?.revealed == true) tile.tileResource else -1
+            }
+        }
+        return state
+    }
+
+    fun setState(state: IntArray) {
+        val revealedResources = state.filter { it != -1 }
+        logic.matches = revealedResources.size / 2
+
+        val remainingTilesCount = state.count { it == -1 }
+        val remainingPairs = remainingTilesCount / 2
+
+        val availableIcons = icons.filter { it !in revealedResources }.toMutableList()
+        val shuffledRemaining: MutableList<Int> = mutableListOf()
+        for (i in 0 until remainingPairs) {
+            val icon = availableIcons.getOrElse(i % availableIcons.size) { icons[i % icons.size] }
+            shuffledRemaining.add(icon)
+            shuffledRemaining.add(icon)
+        }
+        if (remainingTilesCount % 2 != 0) {
+            shuffledRemaining.add(availableIcons.getOrElse(remainingPairs % availableIcons.size) { icons[0] })
+        }
+        shuffledRemaining.shuffle()
+
+        for (row in 0 until rows) {
+            for (col in 0 until cols) {
+                val index = row * cols + col
+                val tile = tiles["${row}x${col}"] ?: continue
+                if (state[index] != -1) {
+                    tile.tileResource = state[index]
+                    tile.revealed = true
+                } else {
+                    if (shuffledRemaining.isNotEmpty()) {
+                        tile.tileResource = shuffledRemaining.removeAt(0)
+                        tile.revealed = false
+                    }
+                }
+            }
+        }
+    }
+
+    fun getTiles(): List<Tile> {
+        val list = mutableListOf<Tile>()
+        for (row in 0 until rows) {
+            for (col in 0 until cols) {
+                tiles["${row}x${col}"]?.let { list.add(it) }
+            }
+        }
+        return list
+    }
+
     private fun onClickTile(v: View) {
         if (isLocked) return
         val tile = tiles[v.tag] ?: return
