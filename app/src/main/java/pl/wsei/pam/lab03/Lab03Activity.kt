@@ -1,8 +1,13 @@
 package pl.wsei.pam.lab03
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.gridlayout.widget.GridLayout
 import pl.wsei.pam.lab01.R
+import java.util.Random
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -64,6 +70,10 @@ class Lab03Activity : AppCompatActivity() {
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
+                        animatePairedButton(
+                            button = tile.button,
+                            action = {}
+                        )
                     }
                 }
                 GameStates.NoMatch -> {
@@ -86,11 +96,50 @@ class Lab03Activity : AppCompatActivity() {
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
+                        animatePairedButton(
+                            button = tile.button,
+                            action = {}
+                        )
                     }
                     Toast.makeText(this, "Gratulacje! Gra ukończona. \uD83C\uDFC6", Toast.LENGTH_LONG).show()
                 }
             }
         }
+    }
+
+    private fun animatePairedButton(button: ImageButton, action: Runnable ) {
+        val set = AnimatorSet()
+        val random = Random()
+        button.pivotX = random.nextFloat() * 200f
+        button.pivotY = random.nextFloat() * 200f
+
+        val rotation = ObjectAnimator.ofFloat(button, "rotation", 1080f)
+        val scallingX = ObjectAnimator.ofFloat(button, "scaleX", 1f, 4f)
+        val scallingY = ObjectAnimator.ofFloat(button, "scaleY", 1f, 4f)
+        val fade = ObjectAnimator.ofFloat(button, "alpha", 1f, 0f)
+        set.startDelay = 500
+        set.duration = 2000
+        set.interpolator = DecelerateInterpolator()
+        set.playTogether(rotation, scallingX, scallingY, fade)
+        set.addListener(object: Animator.AnimatorListener {
+
+            override fun onAnimationStart(animator: Animator) {
+            }
+
+            override fun onAnimationEnd(animator: Animator) {
+                button.scaleX = 1f
+                button.scaleY = 1f
+                button.alpha = 0.0f
+                action.run();
+            }
+
+            override fun onAnimationCancel(animator: Animator) {
+            }
+
+            override fun onAnimationRepeat(animator: Animator) {
+            }
+        })
+        set.start()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
