@@ -5,6 +5,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
@@ -21,6 +22,20 @@ import kotlin.concurrent.schedule
 
 class Lab03Activity : AppCompatActivity() {
     private lateinit var mBoardModel: MemoryBoardView
+    lateinit var completionPlayer: MediaPlayer
+    lateinit var negativePLayer: MediaPlayer
+
+    override protected fun onResume() {
+        super.onResume()
+        completionPlayer = MediaPlayer.create(applicationContext, R.raw.completion)
+        negativePLayer = MediaPlayer.create(applicationContext, R.raw.negative_guitar)
+    }
+
+    override protected fun onPause() {
+        super.onPause();
+        completionPlayer.release()
+        negativePLayer.release()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +80,13 @@ class Lab03Activity : AppCompatActivity() {
                     }
                 }
                 GameStates.Match -> {
+                    completionPlayer.start();
                     e.tiles.forEach { tile ->
                         tile.revealed = true
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
+                        completionPlayer.start();
                         animatePairedButton(
                             button = tile.button,
                             action = {}
@@ -81,7 +98,7 @@ class Lab03Activity : AppCompatActivity() {
 
                     val tilesToHide = e.tiles
                     var finishedAnimations = 0
-
+                    negativePLayer.start()
                     tilesToHide.forEach { tile ->
                         tile.revealed = true
 
@@ -106,6 +123,7 @@ class Lab03Activity : AppCompatActivity() {
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
+                        completionPlayer.start()
                         animatePairedButton(
                             button = tile.button,
                             action = {}
