@@ -7,6 +7,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.Toast
@@ -22,6 +25,7 @@ import kotlin.concurrent.schedule
 
 class Lab03Activity : AppCompatActivity() {
     private lateinit var mBoardModel: MemoryBoardView
+    private var isSound: Boolean = true
     lateinit var completionPlayer: MediaPlayer
     lateinit var negativePLayer: MediaPlayer
 
@@ -37,6 +41,30 @@ class Lab03Activity : AppCompatActivity() {
         negativePLayer.release()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.board_activity_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.board_activity_sound -> {
+                if (isSound) {
+                    Toast.makeText(this, "Sound turned off", Toast.LENGTH_SHORT).show()
+                    item.setIcon(R.drawable.baseline_volume_off_24)
+                    isSound = false
+                } else {
+                    Toast.makeText(this, "Sound turned on", Toast.LENGTH_SHORT).show()
+                    item.setIcon(R.drawable.baseline_volume_up_24)
+                    isSound = true
+                }
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,6 +74,8 @@ class Lab03Activity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+
 
         val size = intent.getIntArrayExtra("size") ?: intArrayOf(4, 4)
         val rows = size[0]
@@ -80,13 +110,14 @@ class Lab03Activity : AppCompatActivity() {
                     }
                 }
                 GameStates.Match -> {
-                    completionPlayer.start();
                     e.tiles.forEach { tile ->
                         tile.revealed = true
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
-                        completionPlayer.start();
+                        if(isSound) {
+                            completionPlayer.start();
+                        }
                         animatePairedButton(
                             button = tile.button,
                             action = {}
@@ -98,7 +129,10 @@ class Lab03Activity : AppCompatActivity() {
 
                     val tilesToHide = e.tiles
                     var finishedAnimations = 0
-                    negativePLayer.start()
+                    if(isSound) {
+                        negativePLayer.start()
+                    }
+
                     tilesToHide.forEach { tile ->
                         tile.revealed = true
 
@@ -123,7 +157,9 @@ class Lab03Activity : AppCompatActivity() {
                         tile.button.backgroundTintList = ColorStateList.valueOf(Color.rgb(0, 102, 0))
                         tile.button.imageTintList = ColorStateList.valueOf(Color.WHITE)
                         tile.removeOnClickListener()
-                        completionPlayer.start()
+                        if(isSound) {
+                            completionPlayer.start()
+                        }
                         animatePairedButton(
                             button = tile.button,
                             action = {}

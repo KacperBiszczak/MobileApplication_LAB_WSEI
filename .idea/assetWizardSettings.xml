@@ -33,8 +33,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="outline_filter_vintage_24" />
-                            <entry key="sourceFile" value="C:\Users\user\gitRepo\androidWSEI\MobileApplication_LAB_WSEI" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="baseline_volume_down_24" />
+                            <entry key="sourceFile" value="C:\Users\user\Downloads\volume_off_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.svg" />
                           </map>
                         </option>
                       </PersistentState>
