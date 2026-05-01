@@ -78,18 +78,28 @@ class Lab03Activity : AppCompatActivity() {
                 }
                 GameStates.NoMatch -> {
                     mBoardModel.lock()
-                    e.tiles.forEach { tile -> 
-                        tile.revealed = true 
-                    }
-                    Timer().schedule(1000) {
-                        runOnUiThread {
-                            e.tiles.forEach { tile -> 
-                                tile.revealed = false 
+
+                    val tilesToHide = e.tiles
+                    var finishedAnimations = 0
+
+                    tilesToHide.forEach { tile ->
+                        tile.revealed = true
+
+                        animateUnpairedButton(
+                            button = tile.button,
+                            action = {
+                                tile.revealed = false
+
+                                finishedAnimations++
+                                if (finishedAnimations == tilesToHide.size) {
+                                    mBoardModel.unlock()
+                                }
                             }
-                            mBoardModel.unlock()
-                        }
+                        )
                     }
                 }
+
+
                 GameStates.Finished -> {
                     e.tiles.forEach { tile ->
                         tile.revealed = true
@@ -130,6 +140,36 @@ class Lab03Activity : AppCompatActivity() {
                 button.scaleX = 1f
                 button.scaleY = 1f
                 button.alpha = 0.0f
+                action.run();
+            }
+
+            override fun onAnimationCancel(animator: Animator) {
+            }
+
+            override fun onAnimationRepeat(animator: Animator) {
+            }
+        })
+        set.start()
+    }
+
+    private fun animateUnpairedButton(button: ImageButton, action: Runnable ) {
+        val set = AnimatorSet()
+
+        val rotation = ObjectAnimator.ofFloat(button, "rotation", 3f,-3f,0f)
+        val fade = ObjectAnimator.ofFloat(button, "alpha", 1f, 1f)
+        set.startDelay = 200
+        set.duration = 1000
+        set.interpolator = DecelerateInterpolator()
+        set.playTogether(rotation, fade)
+        set.addListener(object: Animator.AnimatorListener {
+
+            override fun onAnimationStart(animator: Animator) {
+            }
+
+            override fun onAnimationEnd(animator: Animator) {
+                button.rotation = 0f;
+//                button.alpha = 0.0f
+
                 action.run();
             }
 
