@@ -10,4 +10,5 @@
     <string name="_4_x_6">4 x 6</string>
     <string name="_6_x_4">6 x 4</string>
     <string name="board_activity_menu_sound" />
+    <string name="title_activity_main">MainActivity</string>
 </resources>
