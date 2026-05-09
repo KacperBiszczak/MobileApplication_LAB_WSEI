@@ -11,7 +11,9 @@
         android:roundIcon="@drawable/outline_clarify_24"
         android:supportsRtl="true"
         android:theme="@style/Theme.Lab01"
+        android:name="pl.wsei.pam.lab06.TodoApplication"
         tools:targetApi="31">
+
         <activity
             android:name="pl.wsei.pam.lab06.MainActivity"
             android:exported="false"
