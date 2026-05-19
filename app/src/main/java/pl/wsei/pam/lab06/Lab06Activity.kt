@@ -1,10 +1,13 @@
 package pl.wsei.pam.lab06
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,12 +28,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import pl.wsei.pam.lab06.data.Priority
 import pl.wsei.pam.lab06.data.TodoTask
 import pl.wsei.pam.lab06.ui.AppViewModelProvider
 import pl.wsei.pam.lab06.ui.FormScreen
 import pl.wsei.pam.lab06.ui.ListViewModel
 import pl.wsei.pam.lab06.ui.theme.Lab01Theme
+import pl.wsei.pam.MainActivity.Companion.container
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,7 +115,22 @@ fun ListScreen(
 }
 
 @Composable
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
 fun MainScreen() {
+    val postNotificationPermission =
+        rememberPermissionState(
+            permission = Manifest.permission.POST_NOTIFICATIONS
+        )
+
+    LaunchedEffect(key1 = true) {
+
+        if (!postNotificationPermission.status.isGranted) {
+
+            postNotificationPermission.launchPermissionRequest()
+        }
+    }
+
     val navController = rememberNavController()
     
     NavHost(navController = navController, startDestination = "list") {
@@ -161,7 +183,26 @@ fun AppTopBar(
                         fontSize = 14.sp
                     )
                 }
+            }else {
+                IconButton(onClick = {
+                    container.notificationHandler.showSimpleNotification()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Ustawienia",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Główna",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
+
         }
     )
 }

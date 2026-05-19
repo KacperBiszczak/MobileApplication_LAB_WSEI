@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import pl.wsei.pam.MainActivity
 import pl.wsei.pam.lab06.AppTopBar
 import pl.wsei.pam.lab06.data.CurrentDateProvider
 import pl.wsei.pam.lab06.data.LocalDateConverter
@@ -129,6 +131,8 @@ fun FormScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -139,6 +143,7 @@ fun FormScreen(
                 onSaveClick = {
                     coroutineScope.launch {
                         viewModel.save()
+                        (context as? MainActivity)?.checkAndSetupClosestAlarm()
                         navController.popBackStack()
                     }
                 }

@@ -1,6 +1,7 @@
 package pl.wsei.pam.lab06.data
 
 import android.content.Context
+import pl.wsei.pam.NotificationHandler
 
 class AppDataContainer(
     private val context: Context
@@ -17,5 +18,7 @@ class AppDataContainer(
         RealCurrentDateProvider()
     }
 
-
+    override val notificationHandler: NotificationHandler by lazy {
+        NotificationHandler(context)
+    }
 }
