@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,23 +14,23 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import pl.wsei.pam.lab06.data.Priority
+import pl.wsei.pam.lab06.data.TodoTask
+import pl.wsei.pam.lab06.ui.AppViewModelProvider
+import pl.wsei.pam.lab06.ui.FormScreen
+import pl.wsei.pam.lab06.ui.ListViewModel
 import pl.wsei.pam.lab06.ui.theme.Lab01Theme
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +51,13 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ListScreen(navController: NavController, tasks: SnapshotStateList<TodoTask>) {
+fun ListScreen(
+    navController: NavController,
+    viewModel: ListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    // Obserwujemy strumień danych z bazy danych przez ViewModel
+    val uiState by viewModel.listUiState.collectAsState()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -72,159 +77,30 @@ fun ListScreen(navController: NavController, tasks: SnapshotStateList<TodoTask>)
                 navController = navController,
                 title = "Lista zadań",
                 showBackIcon = false,
-                route = "form"
+                route = "list",
             )
         },
         content = { paddingValues ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(8.dp)
-            ) {
-                items(items = tasks) { item ->
-                    ListItem(
-                        item = item,
-                        onCheckedChange = { isDone ->
-                            val index = tasks.indexOf(item)
-                            if (index != -1) {
-                                tasks[index] = item.copy(isDone = isDone)
-                            }
-                        }
-                    )
+            if (uiState.items.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+                    Text("Brak zadań w bazie danych.")
                 }
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FormScreen(navController: NavController, onAddTask: (TodoTask) -> Unit) {
-    var title by remember { mutableStateOf("") }
-    var deadline by remember { mutableStateOf(LocalDate.now()) }
-    var isDone by remember { mutableStateOf(false) }
-    var priority by remember { mutableStateOf(Priority.Medium) }
-    var expanded by remember { mutableStateOf(false) }
-
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = deadline.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    )
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        deadline = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                    }
-                    showDatePicker = false
-                }) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Anuluj") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-    Scaffold(
-        topBar = {
-            AppTopBar(
-                navController = navController,
-                title = "Dodaj zadanie",
-                showBackIcon = true,
-                route = "list"
-            )
-        },
-        content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Tytuł zadania") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = deadline.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                    onValueChange = { },
-                    label = { Text("Termin") },
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Wybierz datę")
-                        }
-                    }
-                )
-
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = priority.name,
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text("Priorytet") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        Priority.entries.forEach { p ->
-                            DropdownMenuItem(
-                                text = { Text(p.name) },
-                                onClick = {
-                                    priority = p
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+            } else {
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { isDone = !isDone }
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(8.dp)
                 ) {
-                    Checkbox(
-                        checked = isDone,
-                        onCheckedChange = { isDone = it }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Zadanie ukończone")
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(
-                    onClick = {
-                        if (title.isNotBlank()) {
-                            onAddTask(TodoTask(title, deadline, isDone, priority))
-                            navController.popBackStack()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Zapisz zadanie")
+                    items(items = uiState.items, key = { it.id }) { item ->
+                        ListItem(
+                            item = item,
+                            onCheckedChange = { isDone ->
+                                // Zapisujemy zmianę stanu bezpośrednio w bazie danych
+                                viewModel.updateTask(item, isDone)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -234,28 +110,15 @@ fun FormScreen(navController: NavController, onAddTask: (TodoTask) -> Unit) {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    // Zarządzanie stanem listy zadań na poziomie MainScreen
-    val tasks = remember { 
-        mutableStateListOf<TodoTask>().apply { addAll(todoTasks()) } 
-    }
     
     NavHost(navController = navController, startDestination = "list") {
         composable("list") { 
-            ListScreen(navController = navController, tasks = tasks) 
+            ListScreen(navController = navController) 
         }
         composable("form") { 
-            FormScreen(navController = navController, onAddTask = { newTask ->
-                tasks.add(newTask)
-            }) 
+            // Korzystamy z FormScreen (zdefiniowanego w FormViewModel.kt), który obsługuje zapis do Room
+            FormScreen(navController = navController) 
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    Lab01Theme {
-        MainScreen()
     }
 }
 
@@ -265,7 +128,9 @@ fun AppTopBar(
     navController: NavController,
     title: String,
     showBackIcon: Boolean,
-    route: String) {
+    route: String,
+    onSaveClick: () -> Unit = { }
+) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -284,45 +149,22 @@ fun AppTopBar(
             }
         },
         actions = {
-            if (route == "form") {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        tint = Color.Gray
-                    )
-                }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = "Home",
-                        tint = Color.Blue
+            // Przycisk "Zapisz" widoczny tylko na ekranie formularza
+            // W FormScreen() z FormViewModel.kt route paska ustawiony jest tak, by przycisk się pojawił
+            if (title == "Dodaj zadanie" || route == "form") {
+                OutlinedButton(
+                    onClick = onSaveClick,
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    Text(
+                        text = "Zapisz",
+                        fontSize = 14.sp
                     )
                 }
             }
         }
     )
 }
-
-fun todoTasks(): List<TodoTask> {
-    return listOf(
-        TodoTask("Programming", LocalDate.of(2024, 4, 18), false, Priority.Low),
-        TodoTask("Teaching", LocalDate.of(2024, 5, 12), false, Priority.High),
-        TodoTask("Learning", LocalDate.of(2024, 6, 28), true, Priority.Low),
-        TodoTask("Cooking", LocalDate.of(2024, 8, 18), false, Priority.Medium),
-    )
-}
-
-enum class Priority {
-    High, Medium, Low
-}
-
-data class TodoTask(
-    val title: String,
-    val deadline: LocalDate,
-    val isDone: Boolean,
-    val priority: Priority
-)
 
 @Composable
 fun ListItem(item: TodoTask, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
@@ -354,7 +196,7 @@ fun ListItem(item: TodoTask, onCheckedChange: (Boolean) -> Unit, modifier: Modif
                     style = MaterialTheme.typography.bodySmall,
                     color = when (item.priority) {
                         Priority.High -> Color.Red
-                        Priority.Medium -> Color(0xFFFFA500) // Orange
+                        Priority.Medium -> Color(0xFFFFA500)
                         Priority.Low -> Color.Green
                     }
                 )
